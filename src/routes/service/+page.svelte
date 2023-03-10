@@ -9,6 +9,17 @@
 		};
 	};
 
+  async function getRandomNumber() {
+		const res = await fetch(`https://svelte.dev/tutorial/random-number`);
+		const text = await res.text();
+
+		if (res.ok) {
+			return text;
+		} else {
+			throw new Error(text);
+		}
+	}
+
 	async function getGeneratedImage(image_file) {
 		// const response = await fetch();
 		// const generatedImage = await response.image();
@@ -24,7 +35,8 @@
 	const onButtonClicked = (event) => {
 		// TODO 1 : send Generative API request
 		diffusionExecuted = true;
-		diffusionPromise = getGeneratedImage(cloth);
+		// diffusionPromise = getGeneratedImage(cloth);
+		diffusionPromise = getRandomNumber();
 		// TODO 2 : after API response, display generated Images
 	};
 </script>
@@ -78,7 +90,8 @@
 			{#await diffusionPromise}
 				<p>Waiting Diffusion Processing...</p>
 			{:then generatedImage}
-				<img class="cloth" src={generatedImage} />
+				<!-- <img class="cloth" src={generatedImage} /> -->
+        <p>random text is {generatedImage}</p>
 			{:catch error}
 				<p style="color: red">{error.message}</p>
 			{/await}
