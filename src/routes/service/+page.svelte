@@ -1,6 +1,7 @@
 <script>
 	let cloth, fileinput, diffusionPromise, generatedImage, diffusionExecuted;
 	const onFileSelected = (event) => {
+		diffusionExecuted = false;
 		let image = event.target.files[0];
 		let reader = new FileReader();
 		reader.readAsDataURL(image);
@@ -9,16 +10,18 @@
 		};
 	};
 
-  async function getRandomNumber() {
-		const res = await fetch(`https://svelte.dev/tutorial/random-number`);
-		const text = await res.text();
+	// async function getRandomNumber() {
+	// 	const res = await fetch(`https://svelte.dev/tutorial/random-number`);
+	// 	const text = await res.text();
 
-		if (res.ok) {
-			return text;
-		} else {
-			throw new Error(text);
-		}
-	}
+	// 	if (res.ok) {
+	// 		return text;
+	// 	} else {
+	// 		throw new Error(text);
+	// 	}
+	// }
+
+	async function download() {}
 
 	async function getGeneratedImage(image_file) {
 		// const response = await fetch();
@@ -35,8 +38,8 @@
 	const onButtonClicked = (event) => {
 		// TODO 1 : send Generative API request
 		diffusionExecuted = true;
-		// diffusionPromise = getGeneratedImage(cloth);
-		diffusionPromise = getRandomNumber();
+		diffusionPromise = getGeneratedImage(cloth);
+		// diffusionPromise = getRandomNumber();
 		// TODO 2 : after API response, display generated Images
 	};
 </script>
@@ -83,28 +86,32 @@
 
 	{#if cloth}
 		<h1>Generated Image</h1>
-		<button on:click={onButtonClicked}>Generate AI Image</button>
+		<div class="button-container">
+			<button on:click={onButtonClicked}>Generate AI Image</button>
+		</div>
 	{/if}
 	{#if diffusionExecuted}
 		<div>
 			{#await diffusionPromise}
 				<p>Waiting Diffusion Processing...</p>
 			{:then generatedImage}
-				<!-- <img class="cloth" src={generatedImage} /> -->
-        <p>random text is {generatedImage}</p>
+				<img class="cloth" src={generatedImage} alt=""/>
+				<div class="button-container">
+					<button on:click={download}>Download</button>
+				</div>
 			{:catch error}
 				<p style="color: red">{error.message}</p>
 			{/await}
 		</div>
 	{/if}
-	<input
-		style="display:none"
-		type="file"
-		accept=".jpg, .jpeg, .png"
-		on:change={(e) => onFileSelected(e)}
-		bind:this={fileinput}
-	/>
 </div>
+<input
+	style="display:none"
+	type="file"
+	accept=".jpg, .jpeg, .png"
+	on:change={(e) => onFileSelected(e)}
+	bind:this={fileinput}
+/>
 
 <style>
 	#app {
@@ -125,4 +132,32 @@
 		height: 200px;
 		width: 200px;
 	}
+	.button-container {
+		/* position: relative; */
+		/* top: 0;
+		left: 0; */
+		/* width: 100vw; */
+		/* height: 100vh;  */
+    margin: 4px;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-evenly;
+		align-items: center;
+		font-family: sans-serif;
+	}
+
+  .button-container > button {
+        width: 128px;
+        height: 48px;
+        background-color: black;
+        color: white;
+        font-weight: bold;
+        border: none;
+    }
+
+    .button-container > button:hover {
+        background-color: white;
+        color: black;
+        outline: black solid 2px;
+    }
 </style>
