@@ -1,5 +1,5 @@
 <script>
-	let cloth, fileinput;
+	let cloth, fileinput, diffusionPromise, generatedImage, diffusionExecuted;
 	const onFileSelected = (event) => {
 		let image = event.target.files[0];
 		let reader = new FileReader();
@@ -8,9 +8,27 @@
 			cloth = event.target.result;
 		};
 	};
+
+	async function getGeneratedImage(image_file) {
+		// const response = await fetch();
+		// const generatedImage = await response.image();
+		generatedImage = image_file;
+
+		if (true) {
+			return generatedImage;
+		} else {
+			throw new Error('Cloth Diffusion API failed');
+		}
+	}
+
+	const onButtonClicked = (event) => {
+		// TODO 1 : send Generative API request
+		diffusionExecuted = true;
+		diffusionPromise = getGeneratedImage(cloth);
+		// TODO 2 : after API response, display generated Images
+	};
 </script>
 
-<h1>Service Page</h1>
 <div id="app">
 	<h1>Upload Image</h1>
 	{#if cloth}
@@ -50,6 +68,22 @@
 	>
 		Choose Image
 	</div>
+
+	{#if cloth}
+		<h1>Generated Image</h1>
+		<button on:click={onButtonClicked}>Generate AI Image</button>
+	{/if}
+	{#if diffusionExecuted}
+		<div>
+			{#await diffusionPromise}
+				<p>Waiting Diffusion Processing...</p>
+			{:then generatedImage}
+				<img class="cloth" src={generatedImage} />
+			{:catch error}
+				<p style="color: red">{error.message}</p>
+			{/await}
+		</div>
+	{/if}
 	<input
 		style="display:none"
 		type="file"
